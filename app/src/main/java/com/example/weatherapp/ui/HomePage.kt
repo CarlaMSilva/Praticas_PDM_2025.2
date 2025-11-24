@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherapp.ui.theme.WeatherAppTheme
-
+@Preview(showBackground = true)
 @Composable
 fun HomePage(modifier: Modifier = Modifier) {
     Column(
@@ -36,7 +36,8 @@ fun HomePage(modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold,
             color = Color.White,
             modifier = modifier.align(CenterHorizontally),
-            textAlign = TextAlign.Center, fontSize = 20.sp
+            textAlign = TextAlign.Center,
+            fontSize = 20.sp
         )
     }
 }
