@@ -23,9 +23,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherapp.ui.theme.WeatherAppTheme
-@Preview(showBackground = true)
+import com.example.weatherapp.viewmodel.MainViewModel
+
+//@Preview(showBackground = true)
 @Composable
-fun HomePage(modifier: Modifier = Modifier) {
+fun HomePage(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel
+) {
+    val cityList = viewModel.cities
     Column(
         modifier = modifier.fillMaxSize()
         .background(Color.Blue)
