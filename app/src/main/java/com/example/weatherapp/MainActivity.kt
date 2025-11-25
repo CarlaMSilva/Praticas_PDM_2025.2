@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
                         FloatingActionButton(
                             onClick = {
                                 showDialog = true
+                                
                             }
                         ) {
                             Icon(Icons.Default.Add, contentDescription = "Adicionar")
