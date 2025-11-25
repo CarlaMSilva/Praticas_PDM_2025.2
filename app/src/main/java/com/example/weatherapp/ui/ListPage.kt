@@ -51,8 +51,7 @@ fun ListPage(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(
-                8.dp
+            .padding(                8.dp)
             ) {
                 items(cityList, key = { it.name }) { city ->
                     CityItem(
@@ -75,7 +74,7 @@ fun ListPage(
 
             }
 
-                )
+
 }
 
 

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.weatherapp.model.City
 
 class MainViewModel : ViewModel() {
-    private val _cities = getCities().toMutableStateList()
+    private val _cities = getInitialCities().toMutableStateList()
 
 
     val cities
@@ -17,7 +17,7 @@ class MainViewModel : ViewModel() {
  fun add(name: String) {
      _cities.add(City(name = name))
  }
-    private fun getCities() = List(20) { i ->
+    private fun getInitialCities() = List(20) { i ->
         City(
             name = "Cidade $i",
             weather = "Carregando clima..."
