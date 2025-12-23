@@ -35,7 +35,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun MapPage(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel
 ) {
     val context = LocalContext.current
 
