@@ -1,4 +1,5 @@
 import io.netty.util.ReferenceCountUtil.release
+import java.util.Properties
 
 
 plugins {
@@ -24,6 +25,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val keyFile = project.rootProject.file("local.properties")
+        val props = Properties()
+        props.load(keyFile.inputStream())
+        buildConfigField ("String", "WEATHER_API_KEY",
+            props.getProperty("WEATHER_API_KEY"))
     }
 
     buildTypes {
@@ -44,6 +51,9 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -73,6 +83,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation ("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation ("com.squareup.retrofit2:converter-gson:3.0.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
