@@ -31,6 +31,7 @@ import com.example.weatherapp.ui.nav.MainNavHost
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.viewmodel.MainViewModel
 import androidx.activity.compose.rememberLauncherForActivityResult
+import com.example.weatherapp.api.WeatherService
 import com.example.weatherapp.db.fb.FBDatabase
 import com.example.weatherapp.viewmodel.MainViewModelFactory
 import com.google.firebase.Firebase
@@ -45,8 +46,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val fbDB = remember { FBDatabase() }
-            val viewModel: MainViewModel = viewModel(factory = MainViewModelFactory(fbDB)
-            )
+            val weatherService = remember { WeatherService() }
+            val viewModel: MainViewModel = viewModel(
+                factory = MainViewModelFactory(fbDB, weatherService))
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
 

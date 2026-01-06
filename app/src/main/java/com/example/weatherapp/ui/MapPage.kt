@@ -31,7 +31,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun MapPage(
     modifier: Modifier = Modifier,
