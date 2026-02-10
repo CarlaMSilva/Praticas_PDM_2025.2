@@ -31,7 +31,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun MapPage(
     modifier: Modifier = Modifier,
@@ -64,10 +64,11 @@ fun MapPage(
             properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
             uiSettings = MapUiSettings(myLocationButtonEnabled = true),
             onMapClick = { latLng ->
-                viewModel.add(
-                    "Cidade@${latLng.latitude}:${latLng.longitude}",
-                    location = latLng
-                )
+//                viewModel.add(
+//                    "Cidade@${latLng.latitude}:${latLng.longitude}",
+//                    location = latLng
+
+                viewModel.addCity(  latLng)
             }
 
         ) {
