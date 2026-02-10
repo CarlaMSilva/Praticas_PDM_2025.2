@@ -1,0 +1,767 @@
+Index: app/src/main/java/com/example/weatherapp/api/WeatherServiceAPI.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.api\r\n\r\nimport android.util.Log\r\nimport com.example.weatherapp.BuildConfig\r\nimport retrofit2.http.GET\r\nimport retrofit2.http.Query\r\nimport retrofit2.Call\r\nimport retrofit2.Callback\r\nimport retrofit2.Response\r\n\r\n\r\ninterface WeatherServiceAPI {\r\n//    val weatherAPI: Any\r\n\r\n    companion object {\r\n        const val BASE_URL = \"https://api.weatherapi.com/v1/\"\r\n        const val API_KEY = BuildConfig.WEATHER_API_KEY\r\n    }\r\n\r\n    @GET(\"geo/1.0/direct\")\r\n    fun search(\r\n        @Query(\"q\") query: String\r\n    ): Call<List<APILocation>>\r\n\r\n    // Procura a localização baseado no nome ou coordenadas\r\n    @GET(\"current.json?key=$API_KEY&lang=pt\")\r\n    fun weather(@Query(\"q\") query: String): Call<APICurrentWeather?>\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/api/WeatherServiceAPI.kt b/app/src/main/java/com/example/weatherapp/api/WeatherServiceAPI.kt
+--- a/app/src/main/java/com/example/weatherapp/api/WeatherServiceAPI.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/api/WeatherServiceAPI.kt	(date 1770060108351)
+@@ -1,29 +1,37 @@
+ package com.example.weatherapp.api
+ 
+ import android.util.Log
+-import com.example.weatherapp.BuildConfig
++import com.example.weatherapp.api.WEATHER_API_KEY
++import com.google.firebase.BuildConfig
+ import retrofit2.http.GET
+ import retrofit2.http.Query
+ import retrofit2.Call
+ import retrofit2.Callback
+ import retrofit2.Response
+ 
++annotation class WEATHER_API_KEY
+ 
+ interface WeatherServiceAPI {
+-//    val weatherAPI: Any
+ 
+     companion object {
+         const val BASE_URL = "https://api.weatherapi.com/v1/"
+-        const val API_KEY = BuildConfig.WEATHER_API_KEY
++
+     }
+ 
+-    @GET("geo/1.0/direct")
+-    fun search(
+-        @Query("q") query: String
+-    ): Call<List<APILocation>>
++    @GET("current.json")
++    fun weather(
++        @Query("key") apiKey: String,
++        @Query("q") query: String,
++        @Query("lang") lang: String = "pt"
++    ): Call<APICurrentWeather?>
+ 
+-    // Procura a localização baseado no nome ou coordenadas
+-    @GET("current.json?key=$API_KEY&lang=pt")
+-    fun weather(@Query("q") query: String): Call<APICurrentWeather?>
++    @GET("forecast.json")
++    fun forecast(
++        @Query("key") apiKey: String,
++        @Query("q") name: String,
++        @Query("days") days: Int = 10,
++        @Query("lang") lang: String = "pt"
++    ): Call<APIWeatherForecast?>
+ 
++    fun search(query: String): Call<List<APILocation>?>
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/weatherapp/ui/CityDialog.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.ui\r\n\r\nimport android.view.Surface\r\nimport androidx.compose.foundation.clickable\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.Close\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.Icon\r\nimport androidx.compose.material3.OutlinedTextField\r\nimport androidx.compose.material3.SegmentedButtonDefaults.Icon\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.window.Dialog\r\n\r\n@Composable\r\nfun CityDialog(onDismiss: () -> Unit, onConfirm: (city: String) -> Unit) {\r\n    val cityName = remember { mutableStateOf(\"\") }\r\n\r\n    Dialog(onDismissRequest = { onDismiss() } ) {\r\n        Surface(shape = RoundedCornerShape(16.dp)) {\r\n            Column(modifier = Modifier.padding(20.dp)) {\r\n                Row(\r\n                    modifier = Modifier.fillMaxWidth(),\r\n                    horizontalArrangement = Arrangement.SpaceBetween,\r\n                    verticalAlignment = Alignment.CenterVertically\r\n                ) {\r\n                    Text(text = \"Adicionar cidade favorita:\")\r\n                    Icon(\r\n                        imageVector = Icons.Filled.Close,\r\n                        contentDescription = \"\",\r\n                        modifier = Modifier.clickable { onDismiss() })\r\n                }\r\n                Spacer(modifier = Modifier.height(20.dp))\r\n                OutlinedTextField(\r\n                    modifier = Modifier.fillMaxWidth(),\r\n                    label = { Text(text = \"Nome da cidade\") },\r\n                    value = cityName.value,\r\n                    onValueChange = { cityName.value = it })\r\n                Spacer(modifier = Modifier.height(20.dp))\r\n                Button(\r\n                    onClick = { onConfirm(cityName.value) },\r\n                    modifier = Modifier.fillMaxWidth().height(50.dp)\r\n                ) { Text(text = \"OK\") }\r\n            }\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/ui/CityDialog.kt b/app/src/main/java/com/example/weatherapp/ui/CityDialog.kt
+--- a/app/src/main/java/com/example/weatherapp/ui/CityDialog.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/ui/CityDialog.kt	(date 1770057418432)
+@@ -1,6 +1,5 @@
+ package com.example.weatherapp.ui
+ 
+-import android.view.Surface
+ import androidx.compose.foundation.clickable
+ import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.Column
+@@ -15,7 +14,6 @@
+ import androidx.compose.material3.Button
+ import androidx.compose.material3.Icon
+ import androidx.compose.material3.OutlinedTextField
+-import androidx.compose.material3.SegmentedButtonDefaults.Icon
+ import androidx.compose.material3.Surface
+ import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
+Index: app/src/main/java/com/example/weatherapp/api/WeatherService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.api\r\n\r\nimport android.util.Log\r\nimport retrofit2.Call\r\nimport retrofit2.Callback\r\nimport retrofit2.Response\r\nimport retrofit2.Retrofit\r\nimport retrofit2.converter.gson.GsonConverterFactory\r\n\r\nclass WeatherService {\r\n    private var weatherAPI: WeatherServiceAPI\r\n    init {\r\n        val retrofitAPI = Retrofit.Builder().baseUrl(WeatherServiceAPI.BASE_URL)\r\n            .addConverterFactory(GsonConverterFactory.create()).build()\r\n        weatherAPI = retrofitAPI . create (WeatherServiceAPI::class.java)\r\n    }\r\n\r\n    fun getName(lat: Double, lng: Double, onResponse: (String?) -> Unit) {\r\n        search(\"$lat,$lng\") { loc -> onResponse(loc?.name) }\r\n    }\r\n\r\n    fun getLocation(name: String, onResponse: (lat: Double?, long: Double?) -> Unit) {\r\n        search(name) { loc -> onResponse(loc?.lat, loc?.lon) }\r\n    }\r\n\r\n    private fun search(query: String, onResponse: (APILocation?) -> Unit) {\r\n        val call: Call<List<APILocation>?> = weatherAPI .search(query) as Call<List<APILocation>?>\r\n        call . enqueue (object : Callback<List<APILocation>?> {\r\n                override fun onResponse(call: Call<List<APILocation>?>,\r\n                    response: Response<List<APILocation>?>\r\n                ) {\r\n                    onResponse(response.body()?.let { if (it.isNotEmpty()) it[0] else null })\r\n                }\r\n\r\n                override fun onFailure(call: Call<List<APILocation>?>, t: Throwable) {\r\n                    Log.w(\"WeatherApp WARNING\", \"\" + t.message)\r\n                    onResponse (null)\r\n                }\r\n            })\r\n    }\r\n    private fun <T> enqueue(call: Call<T?>, onResponse: ((T?) -> Unit)? = null) {\r\n        call.enqueue(object : Callback<T?> {\r\n            override fun onResponse(call: Call<T?>, response: Response<T?>) {\r\n                val obj: T? = response.body()\r\n                onResponse ?. invoke (obj)\r\n            }\r\n\r\n            override fun onFailure(call: Call<T?>, t: Throwable) {\r\n                Log.w(\"WeatherApp WARNING\", \"\" + t.message)\r\n            }\r\n        })\r\n    }\r\n    fun getWeather(name: String, onResponse: (APICurrentWeather?) -> Unit) {\r\n        val call: Call<APICurrentWeather?> =\r\n            weatherAPI.weather(name)\r\n        enqueue (call) { onResponse.invoke(it) }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/api/WeatherService.kt b/app/src/main/java/com/example/weatherapp/api/WeatherService.kt
+--- a/app/src/main/java/com/example/weatherapp/api/WeatherService.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/api/WeatherService.kt	(date 1770060227173)
+@@ -52,7 +52,22 @@
+     }
+     fun getWeather(name: String, onResponse: (APICurrentWeather?) -> Unit) {
+         val call: Call<APICurrentWeather?> =
+-            weatherAPI.weather(name)
++            weatherAPI.weather(
++                name,
++                query = TODO(),
++                lang = TODO()
++            )
++        enqueue (call) { onResponse.invoke(it) }
++    }
++
++    fun getForecast(name: String, onResponse: (APIWeatherForecast?) -> Unit) {
++        val call: Call<APIWeatherForecast?> =
++            weatherAPI.forecast(
++                name,
++                name = TODO(),
++                days = TODO(),
++                lang = TODO()
++            )
+         enqueue (call) { onResponse.invoke(it) }
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/weatherapp/ui/HomePage.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.ui\r\n\r\nimport MainViewModel\r\nimport android.app.Activity\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.size\r\nimport androidx.compose.foundation.layout.wrapContentSize\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Alignment.Companion.CenterHorizontally\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.platform.LocalContext\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.text.style.TextAlign\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport com.example.weatherapp.ui.theme.WeatherAppTheme\r\n//import com.example.weatherapp.viewmodel.MainViewModel\r\n\r\n//@Preview(showBackground = true)\r\n@Composable\r\nfun HomePage(\r\n    modifier: Modifier = Modifier,\r\n    viewModel: MainViewModel\r\n) {\r\n    val cityList = viewModel.cities\r\n    Column(\r\n        modifier = modifier.fillMaxSize()\r\n        .background(Color.Blue)\r\n        .wrapContentSize(Alignment.Center)\r\n    ) {\r\n        Text(\r\n            text = \"Home\",\r\n            fontWeight = FontWeight.Bold,\r\n            color = Color.White,\r\n            modifier = modifier.align(CenterHorizontally),\r\n            textAlign = TextAlign.Center,\r\n            fontSize = 20.sp\r\n        )\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/ui/HomePage.kt b/app/src/main/java/com/example/weatherapp/ui/HomePage.kt
+--- a/app/src/main/java/com/example/weatherapp/ui/HomePage.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/ui/HomePage.kt	(date 1770124974042)
+@@ -1,50 +1,135 @@
+ package com.example.weatherapp.ui
+ 
+ import MainViewModel
+-import android.app.Activity
++import androidx.compose.foundation.R
+ import androidx.compose.foundation.background
+-import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.clickable
+ import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
+ import androidx.compose.foundation.layout.Spacer
+ import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
+ import androidx.compose.foundation.layout.padding
+ import androidx.compose.foundation.layout.size
+ import androidx.compose.foundation.layout.wrapContentSize
+-import androidx.compose.material3.Button
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.items
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.filled.AccountBox
++import androidx.compose.material.icons.filled.LocationOn
++import androidx.compose.material3.Icon
+ import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
+ import androidx.compose.ui.Alignment
+-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.graphics.Color
+-import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.res.painterResource
+ import androidx.compose.ui.text.font.FontWeight
+ import androidx.compose.ui.text.style.TextAlign
+-import androidx.compose.ui.tooling.preview.Preview
+ import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.unit.sp
+-import com.example.weatherapp.ui.theme.WeatherAppTheme
++import androidx.lifecycle.viewmodel.compose.viewModel
++import com.example.weatherapp.model.Forecast
++import java.text.DecimalFormat
++
+ //import com.example.weatherapp.viewmodel.MainViewModel
+ 
+-//@Preview(showBackground = true)
++
++
++
+ @Composable
+-fun HomePage(
+-    modifier: Modifier = Modifier,
+-    viewModel: MainViewModel
+-) {
+-    val cityList = viewModel.cities
+-    Column(
+-        modifier = modifier.fillMaxSize()
+-        .background(Color.Blue)
+-        .wrapContentSize(Alignment.Center)
+-    ) {
+-        Text(
+-            text = "Home",
+-            fontWeight = FontWeight.Bold,
+-            color = Color.White,
+-            modifier = modifier.align(CenterHorizontally),
+-            textAlign = TextAlign.Center,
+-            fontSize = 20.sp
++fun HomePage(viewModel: MainViewModel, modifier: Modifier.Companion) {
++    Column {
++        if (viewModel.city == null) {
++            Column(
++                modifier = modifier
++                    .fillMaxSize()
++                    .background(Color.Blue)
++                    .wrapContentSize(Alignment.Center)
++            ) {
++                Text(
++                    text = "Selecione uma cidade!",
++                    fontWeight = FontWeight.Bold,
++                    color = Color.White,
++                    modifier = modifier.align(Alignment.CenterHorizontally),
++                    textAlign = TextAlign.Center,
++                    fontSize = 28.sp
++                )
++            }
++        } else {
++            Row {
++                Icon(
++                    imageVector = Icons.Filled.AccountBox,
++                    contentDescription = "Localized description",
++                    modifier = modifier.size(150.dp)
++                )
++                Column {
++                    Spacer(modifier = modifier.size(12.dp))
++                    Text (text = viewModel.city?: "Selecione uma cidade...",
++                        fontSize = 28.sp)
++                    viewModel.city?.let { name ->
++                    val weather = viewModel.weather(name)
++                        Spacer (modifier = modifier.size(12.dp))
++                        Text (text = weather?.desc?: "...",
++                            fontSize = 22.sp)
++                        Spacer(modifier = modifier.size(12.dp))
++                        Text(text = "Temp: "+weather?.temp+"℃",
++                            fontSize = 22.sp)
++                }
++                }
++            }
++            viewModel . forecast (viewModel.city!!)?.let { forecasts ->
++                LazyColumn {
++                    items(items = forecasts) { forecast ->
++                        ForecastItem(forecast,onClick = { })
++                    }
++                }
++            }
++        }
++    }
++}
++
++@Composable
++fun ForecastItem(forecast: Forecast, onClick: (Forecast) -> Unit, modifier: Modifier = Modifier) {
++    val format = DecimalFormat("#.0")
++    val tempMin = format.format(forecast.tempMin)
++    val tempMax = format.format(forecast.tempMax)
++
++    Row (modifier =
++        modifier.fillMaxWidth().padding(12.dp)
++            .clickable(onClick = { onClick(forecast) }),
++        verticalAlignment = Alignment.CenterVertically) {
++        AsyncImage( // Substitui o Icon
++            model = forecast.imgUrl,
++            modifier = Modifier.size(70.dp),
++            error = painterResource(id = R.drawable.loading),
++            contentDescription = "Imagem"
+         )
++    }
++        Icon(
++            imageVector = Icons.Filled.LocationOn,
++            contentDescription = "Localized description",
++            modifier = Modifier.size(48.dp)
++        )
++        Spacer (modifier = Modifier.size(16.dp))
++        Column {
++            Text(
++                modifier = Modifier,
++                text = forecast.weather,
++                fontSize = 24.sp
++            )
++            Row {
++                AsyncImage( // Substitui o Icon
++                    model = viewModel.weather(viewModel.city!!).imgUrl,
++                    modifier = Modifier.size(140.dp),
++                    error = painterResource(id = R.drawable.loading),
++                    contentDescription = "Imagem"
++                )
++                Text(modifier = Modifier, text = forecast.date, fontSize = 20.sp)
++                Spacer (modifier = Modifier.size(12.dp))
++                Text (modifier = Modifier, text = "Min: $tempMin℃", fontSize = 16.sp)
++                Spacer(modifier = Modifier.size(12.dp))
++                Text(modifier = Modifier, text = "Max: $tempMax℃", fontSize = 16.sp)
++            }
++        }
+     }
+-}
+\ No newline at end of file
+Index: app/src/main/java/com/example/weatherapp/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp\r\n\r\nimport MainViewModel\r\n//import MainViewModelFactory\r\nimport android.Manifest\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.activity.result.contract.ActivityResultContracts\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.automirrored.filled.ExitToApp\r\nimport androidx.compose.material.icons.filled.Add\r\nimport androidx.compose.material3.ExperimentalMaterial3Api\r\nimport androidx.compose.material3.FloatingActionButton\r\nimport androidx.compose.material3.Icon\r\nimport androidx.compose.material3.IconButton\r\nimport androidx.compose.material3.Scaffold\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.material3.TopAppBar\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.lifecycle.viewmodel.compose.viewModel\r\nimport androidx.navigation.NavDestination.Companion.hasRoute\r\nimport androidx.navigation.compose.currentBackStackEntryAsState\r\nimport androidx.navigation.compose.rememberNavController\r\nimport com.example.weatherapp.ui.CityDialog\r\nimport com.example.weatherapp.ui.nav.BottomNavBar\r\nimport com.example.weatherapp.ui.nav.BottomNavItem\r\nimport com.example.weatherapp.ui.nav.MainNavHost\r\nimport com.example.weatherapp.ui.theme.WeatherAppTheme\r\n//import com.example.weatherapp.viewmodel.MainViewModel\r\nimport androidx.activity.compose.rememberLauncherForActivityResult\r\nimport com.example.weatherapp.api.WeatherService\r\nimport com.example.weatherapp.db.fb.FBDatabase\r\nimport com.example.weatherapp.viewmodel.MainViewModelFactory\r\nimport com.google.firebase.Firebase\r\nimport com.google.firebase.auth.auth\r\n\r\n\r\nclass MainActivity : ComponentActivity() {\r\n    @OptIn(ExperimentalMaterial3Api::class)\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n\r\n        setContent {\r\n            val fbDB = remember { FBDatabase() }\r\n            val weatherService = remember { WeatherService() }\r\n            val viewModel: MainViewModel = viewModel(\r\n                factory = MainViewModelFactory(fbDB, weatherService)\r\n            )\r\n            val navController = rememberNavController()\r\n            val navBackStackEntry by navController.currentBackStackEntryAsState()\r\n\r\n            val showButton =\r\n                navBackStackEntry?.destination\r\n                    ?.hasRoute(BottomNavItem.Route.List::class) == true\r\n\r\n\r\n            var showDialog by remember { mutableStateOf(false) }\r\n\r\n            val permissionLauncher =\r\n                rememberLauncherForActivityResult(\r\n                    contract = ActivityResultContracts.RequestPermission(),\r\n                    onResult = { /* resultado da permissão */ }\r\n                )\r\n\r\n            LaunchedEffect(Unit) {\r\n                permissionLauncher.launch(\r\n                    Manifest.permission.ACCESS_FINE_LOCATION\r\n                )\r\n            }\r\n\r\n            WeatherAppTheme {\r\n\r\n                if (showDialog) {\r\n                    CityDialog(\r\n                        onDismiss = { showDialog = false },\r\n                        onConfirm = { city ->\r\n                            if (city.isNotBlank()) {\r\n                                viewModel.add(city)\r\n                            }\r\n                            showDialog = false\r\n                        }\r\n                    )\r\n                }\r\n\r\n                Scaffold(\r\n                    topBar = {\r\n                        TopAppBar(\r\n                            title = {\r\n                                val name = viewModel.user?.name ?: \"[carregando...]\"\r\n                                Text(\"Bem-vindo/a! $name\")\r\n                            },\r\n                            actions = {\r\n                                IconButton(onClick = {\r\n                                    Firebase.auth.signOut()\r\n\r\n                                }\r\n                                )\r\n                                {\r\n                                    Icon(\r\n                                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,\r\n                                        contentDescription = \"Sair\"\r\n                                    )\r\n                                }\r\n                            }\r\n                        )\r\n                    },\r\n                    bottomBar = {\r\n                        val items = listOf(\r\n                            BottomNavItem.BottomNavItem.HomeButton,\r\n                            BottomNavItem.BottomNavItem.ListButton,\r\n                            BottomNavItem.BottomNavItem.MapButton\r\n                        )\r\n                        BottomNavBar(\r\n                            navController = navController,\r\n                            items = items\r\n                        )\r\n                    },\r\n                    floatingActionButton = {\r\n                        if (showButton) {\r\n                            FloatingActionButton(\r\n                                onClick = { showDialog = true }\r\n                            ) {\r\n                                Icon(\r\n                                    Icons.Default.Add,\r\n                                    contentDescription = \"Adicionar cidade\"\r\n                                )\r\n                            }\r\n                        }\r\n                    }\r\n                ) { innerPadding ->\r\n                    Box(\r\n                        modifier = Modifier\r\n                            .padding(innerPadding)\r\n                    ) {\r\n//                        launcher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)\r\n                        MainNavHost(navController = navController, viewModel)\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/MainActivity.kt b/app/src/main/java/com/example/weatherapp/MainActivity.kt
+--- a/app/src/main/java/com/example/weatherapp/MainActivity.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/MainActivity.kt	(date 1770057433126)
+@@ -1,7 +1,6 @@
+ package com.example.weatherapp
+ 
+ import MainViewModel
+-//import MainViewModelFactory
+ import android.Manifest
+ import android.os.Bundle
+ import androidx.activity.ComponentActivity
+@@ -31,7 +30,6 @@
+ import com.example.weatherapp.ui.nav.BottomNavItem
+ import com.example.weatherapp.ui.nav.MainNavHost
+ import com.example.weatherapp.ui.theme.WeatherAppTheme
+-//import com.example.weatherapp.viewmodel.MainViewModel
+ import androidx.activity.compose.rememberLauncherForActivityResult
+ import com.example.weatherapp.api.WeatherService
+ import com.example.weatherapp.db.fb.FBDatabase
+@@ -81,7 +79,7 @@
+                         onDismiss = { showDialog = false },
+                         onConfirm = { city ->
+                             if (city.isNotBlank()) {
+-                                viewModel.add(city)
++                                viewModel.addCityName(city)
+                             }
+                             showDialog = false
+                         }
+@@ -117,8 +115,9 @@
+                             BottomNavItem.BottomNavItem.MapButton
+                         )
+                         BottomNavBar(
+-                            navController = navController,
+-                            items = items
++                            viewModel = viewModel,
++                            items = items,
++                            navController = navController
+                         )
+                     },
+                     floatingActionButton = {
+@@ -141,8 +140,20 @@
+ //                        launcher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                         MainNavHost(navController = navController, viewModel)
+                     }
+-                }
+-            }
+-        }
+-    }
+-}
++                    LaunchedEffect(viewModel.page) {
++                        navController.navigate(viewModel.page) {
++                        // Volta pilha de navegação até HomePage (startDest).
++                        navController.graph.startDestinationRoute?.let {
++                            popUpTo(it) {
++                                saveState = true
++                            }
++                            restoreState = true
++                        }
++                            launchSingleTop = true
++                        }
++                    }
++                        }
++                }
++            }
++        }
++    }
+Index: app/src/main/java/com/example/weatherapp/viewmodel/MainViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import androidx.compose.runtime.mutableStateListOf\r\nimport androidx.compose.runtime.mutableStateMapOf\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.lifecycle.ViewModel\r\nimport androidx.lifecycle.ViewModelProvider\r\nimport com.example.weatherapp.api.WeatherService\r\nimport com.example.weatherapp.api.toWeather\r\nimport com.example.weatherapp.db.fb.FBCity\r\nimport com.example.weatherapp.db.fb.FBDatabase\r\nimport com.example.weatherapp.db.fb.FBUser\r\nimport com.example.weatherapp.db.fb.toFBCity\r\nimport com.example.weatherapp.model.City\r\nimport com.example.weatherapp.model.User\r\nimport com.example.weatherapp.model.Weather\r\nimport com.google.android.gms.maps.model.LatLng\r\n\r\nclass MainViewModel (private val db: FBDatabase,\r\n                     private val service : WeatherService): ViewModel(), FBDatabase.Listener {\r\n    private val _cities = mutableStateMapOf<String, City>()\r\n    val cities: List<City>\r\n        get() = _cities.values.toList().sortedBy { it.name }\r\n\r\n    private  val _weather = mutableStateMapOf<String, Weather>()\r\n\r\n    private val _user = mutableStateOf<User?>(null)\r\n    val user: User? get() = _user.value\r\n\r\n    private val _weatherMap = mutableStateMapOf<String, Weather>()\r\n\r\n    fun weather(name: String) = _weather.getOrPut(name) {\r\n        loadWeather(name)\r\n        Weather . LOADING  // return\r\n    }\r\n\r\n//    fun weather(cityName: String): Weather {\r\n//        return _weatherMap[cityName] ?: Weather.LOADING\r\n//    }\r\n\r\n    private fun loadWeather(name: String) {\r\n        service.getWeather(name) { apiWeather ->\r\n            apiWeather?.let {\r\n                _weather[name] = apiWeather.toWeather()\r\n            }\r\n        }\r\n    }\r\n    init { db.setListener(this) }\r\n    fun addCity(name: String) {\r\n        service.getLocation(name) { lat, lng ->\r\n            if (lat != null && lng != null) {\r\n                db.add(City(name=name, location=LatLng(lat, lng)).toFBCity())\r\n            }\r\n        }\r\n    }\r\n    fun addCity(location: LatLng) {\r\n        service.getName(location.latitude, location.longitude) { name ->\r\n            if (name != null) {\r\n                db.add(City(name = name, location = location).toFBCity())\r\n            }\r\n        }\r\n    }\r\n\r\n    fun remove(city: City) {\r\n        db.remove(city.toFBCity())\r\n    }\r\n\r\n    fun add(name: String, location: LatLng? = null) {\r\n        db.add(City(name = name, location = location).toFBCity())\r\n    }\r\n\r\n    override fun onUserLoaded(user: FBUser) {\r\n        _user.value = user.toUser()\r\n    }\r\n\r\n    override fun onUserSignOut() {\r\n        //TODO(\"Not yet implemented\")\r\n\r\n    }\r\n\r\n    override fun onCityAdded(city: FBCity) {\r\n        _cities[city.name!!] = city.toCity()\r\n    }\r\n\r\n    override fun onCityUpdated(city: FBCity) {\r\n        _cities.remove(city.name)\r\n        _cities [city.name!!] = city.toCity()\r\n    }\r\n\r\n    override fun onCityRemoved(city: FBCity) {\r\n        _cities.remove(city.name)\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/viewmodel/MainViewModel.kt b/app/src/main/java/com/example/weatherapp/viewmodel/MainViewModel.kt
+--- a/app/src/main/java/com/example/weatherapp/viewmodel/MainViewModel.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/viewmodel/MainViewModel.kt	(date 1770060261295)
+@@ -1,8 +1,6 @@
+-import androidx.compose.runtime.mutableStateListOf
+ import androidx.compose.runtime.mutableStateMapOf
+ import androidx.compose.runtime.mutableStateOf
+ import androidx.lifecycle.ViewModel
+-import androidx.lifecycle.ViewModelProvider
+ import com.example.weatherapp.api.WeatherService
+ import com.example.weatherapp.api.toWeather
+ import com.example.weatherapp.db.fb.FBCity
+@@ -10,12 +8,15 @@
+ import com.example.weatherapp.db.fb.FBUser
+ import com.example.weatherapp.db.fb.toFBCity
+ import com.example.weatherapp.model.City
++import com.example.weatherapp.model.Forecast
+ import com.example.weatherapp.model.User
+ import com.example.weatherapp.model.Weather
++import com.example.weatherapp.ui.nav.BottomNavItem
+ import com.google.android.gms.maps.model.LatLng
+ 
+-class MainViewModel (private val db: FBDatabase,
+-                     private val service : WeatherService): ViewModel(), FBDatabase.Listener {
++ class MainViewModel (private val db: FBDatabase,
++                              private val service : WeatherService):
++                                ViewModel(), FBDatabase.Listener {
+     private val _cities = mutableStateMapOf<String, City>()
+     val cities: List<City>
+         get() = _cities.values.toList().sortedBy { it.name }
+@@ -27,14 +28,24 @@
+ 
+     private val _weatherMap = mutableStateMapOf<String, Weather>()
+ 
++    private val _forecast = mutableStateMapOf<String, List<Forecast>?>()
++    private var _page = mutableStateOf<BottomNavItem.Route>(BottomNavItem.Route.Home)
++    var page: BottomNavItem.Route
++        get() = _page.value
++        set (tmp) { _page.value = tmp }
++    private var _city = mutableStateOf<String?>(null)
++    var city: String?
++        get() = _city.value
++        set (tmp) { _city.value = tmp }
++
+     fun weather(name: String) = _weather.getOrPut(name) {
+         loadWeather(name)
+         Weather . LOADING  // return
+     }
+-
+-//    fun weather(cityName: String): Weather {
+-//        return _weatherMap[cityName] ?: Weather.LOADING
+-//    }
++    fun forecast(name: String) = _forecast.getOrPut(name) {
++        loadForecast(name)
++        emptyList() // return
++    }
+ 
+     private fun loadWeather(name: String) {
+         service.getWeather(name) { apiWeather ->
+@@ -44,10 +55,11 @@
+         }
+     }
+     init { db.setListener(this) }
+-    fun addCity(name: String) {
++
++    fun addCityName(name: String) {
+         service.getLocation(name) { lat, lng ->
+             if (lat != null && lng != null) {
+-                db.add(City(name=name, location=LatLng(lat, lng)).toFBCity())
++                db.add(City(name =name, location =LatLng(lat, lng)).toFBCity())
+             }
+         }
+     }
+@@ -59,11 +71,12 @@
+         }
+     }
+ 
++
+     fun remove(city: City) {
+         db.remove(city.toFBCity())
+     }
+ 
+-    fun add(name: String, location: LatLng? = null) {
++    fun add(name: String, location: LatLng) {
+         db.add(City(name = name, location = location).toFBCity())
+     }
+ 
+@@ -71,12 +84,11 @@
+         _user.value = user.toUser()
+     }
+ 
+-    override fun onUserSignOut() {
+-        //TODO("Not yet implemented")
+-
+-    }
++     override fun onUserSignOut() {
++         TODO("Not yet implemented")
++     }
+ 
+-    override fun onCityAdded(city: FBCity) {
++     override fun onCityAdded(city: FBCity) {
+         _cities[city.name!!] = city.toCity()
+     }
+ 
+@@ -88,4 +100,9 @@
+     override fun onCityRemoved(city: FBCity) {
+         _cities.remove(city.name)
+     }
+-}
++
++     override fun loadForecast(name: String) {
++         TODO("Not yet implemented")
++     }
++
++ }
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import io.netty.util.ReferenceCountUtil.release\r\nimport java.util.Properties\r\n\r\n\r\nplugins {\r\n    alias(libs.plugins.android.application)\r\n    alias(libs.plugins.kotlin.android)\r\n    alias(libs.plugins.kotlin.compose)\r\n    id(\"org.jetbrains.kotlin.plugin.serialization\") version \"2.2.20\"\r\n    id (\"com.google.android.libraries.mapsplatform.secrets-gradle-plugin\")\r\n    alias(libs.plugins.google.gms.google.services)\r\n}\r\n\r\nandroid {\r\n    namespace = \"com.example.weatherapp\"\r\n    compileSdk {\r\n        version = release(36)\r\n    }\r\n\r\n    defaultConfig {\r\n        applicationId = \"com.example.weatherapp\"\r\n        minSdk = 24\r\n        targetSdk = 36\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n\r\n        val keyFile = project.rootProject.file(\"local.properties\")\r\n        val props = Properties()\r\n        props.load(keyFile.inputStream())\r\n        buildConfigField (\"String\", \"WEATHER_API_KEY\",\r\n            props.getProperty(\"WEATHER_API_KEY\"))\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            isMinifyEnabled = false\r\n            proguardFiles(\r\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"),\r\n                \"proguard-rules.pro\"\r\n            )\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_11\r\n        targetCompatibility = JavaVersion.VERSION_11\r\n    }\r\n    kotlinOptions {\r\n        jvmTarget = \"11\"\r\n    }\r\n    buildFeatures {\r\n        compose = true\r\n    }\r\n    buildFeatures {\r\n        buildConfig = true\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation(libs.androidx.core.ktx)\r\n    implementation(libs.androidx.lifecycle.runtime.ktx)\r\n    implementation(libs.androidx.activity.compose)\r\n    implementation(platform(libs.androidx.compose.bom))\r\n    implementation(libs.androidx.compose.ui)\r\n    implementation(libs.androidx.compose.ui.graphics)\r\n    implementation(libs.androidx.compose.ui.tooling.preview)\r\n    implementation(libs.androidx.compose.material3)\r\n    implementation(\"androidx.navigation:navigation-compose:2.9.5\")\r\n    implementation(\"org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0\")\r\n    implementation(libs.androidx.material3)\r\n    implementation(\"androidx.compose.material:material-icons-extended:1.7.0\")\r\n    implementation(\"androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4\")\r\n    implementation(libs.androidx.camera.core)\r\n    // Google maps\r\n    implementation(\"com.google.android.gms:play-services-maps:19.2.0\")\r\n    implementation(\"com.google.android.gms:play-services-location:21.3.0\")\r\n    // Google maps for compose\r\n    implementation(\"com.google.maps.android:maps-compose:2.8.0\")\r\n    implementation(libs.androidx.ui.graphics)\r\n    implementation(libs.firebase.auth)\r\n    implementation(libs.firebase.firestore)\r\n    implementation(platform(\"com.google.firebase:firebase-bom:32.7.0\"))\r\n    implementation(\"com.google.firebase:firebase-auth-ktx\")\r\n    implementation(\"com.google.firebase:firebase-firestore-ktx\")\r\n    implementation (\"com.squareup.retrofit2:retrofit:3.0.0\")\r\n    implementation (\"com.squareup.retrofit2:converter-gson:3.0.0\")\r\n    implementation(libs.play.services.contextmanager)\r\n\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(libs.androidx.junit)\r\n    androidTestImplementation(libs.androidx.espresso.core)\r\n    androidTestImplementation(platform(libs.androidx.compose.bom))\r\n    androidTestImplementation(libs.androidx.compose.ui.test.junit4)\r\n    debugImplementation(libs.androidx.compose.ui.tooling)\r\n    debugImplementation(libs.androidx.compose.ui.test.manifest)\r\n\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/build.gradle.kts	(date 1770058387079)
+@@ -30,7 +30,7 @@
+         val props = Properties()
+         props.load(keyFile.inputStream())
+         buildConfigField ("String", "WEATHER_API_KEY",
+-            props.getProperty("WEATHER_API_KEY"))
++            "\"${props.getProperty("WEATHER_API_KEY")}\"")
+     }
+ 
+     buildTypes {
+@@ -86,7 +86,8 @@
+     implementation ("com.squareup.retrofit2:retrofit:3.0.0")
+     implementation ("com.squareup.retrofit2:converter-gson:3.0.0")
+     implementation(libs.play.services.contextmanager)
+-
++    implementation(libs.androidx.benchmark.traceprocessor)
++    implementation("io.coil-kt:coil-compose:2.7.0")
+     testImplementation(libs.junit)
+     androidTestImplementation(libs.androidx.junit)
+     androidTestImplementation(libs.androidx.espresso.core)
+Index: gradle/libs.versions.toml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>[versions]\r\nagp = \"8.13.2\"\r\nkotlin = \"2.0.21\"\r\ncoreKtx = \"1.17.0\"\r\njunit = \"4.13.2\"\r\njunitVersion = \"1.3.0\"\r\nespressoCore = \"3.7.0\"\r\nlifecycleRuntimeKtx = \"2.9.4\"\r\nactivityCompose = \"1.11.0\"\r\ncomposeBom = \"2024.09.00\"\r\nmaterial3 = \"1.4.0\"\r\ncameraCore = \"1.5.1\"\r\nuiGraphics = \"1.9.5\"\r\ngoogleGmsGoogleServices = \"4.4.4\"\r\nfirebaseAuth = \"24.0.1\"\r\nfirebaseFirestore = \"26.0.2\"\r\nplayServicesContextmanager = \"9.4.0\"\r\n\r\n[libraries]\r\nandroidx-core-ktx = { group = \"androidx.core\", name = \"core-ktx\", version.ref = \"coreKtx\" }\r\njunit = { group = \"junit\", name = \"junit\", version.ref = \"junit\" }\r\nandroidx-junit = { group = \"androidx.test.ext\", name = \"junit\", version.ref = \"junitVersion\" }\r\nandroidx-espresso-core = { group = \"androidx.test.espresso\", name = \"espresso-core\", version.ref = \"espressoCore\" }\r\nandroidx-lifecycle-runtime-ktx = { group = \"androidx.lifecycle\", name = \"lifecycle-runtime-ktx\", version.ref = \"lifecycleRuntimeKtx\" }\r\nandroidx-activity-compose = { group = \"androidx.activity\", name = \"activity-compose\", version.ref = \"activityCompose\" }\r\nandroidx-compose-bom = { group = \"androidx.compose\", name = \"compose-bom\", version.ref = \"composeBom\" }\r\nandroidx-compose-ui = { group = \"androidx.compose.ui\", name = \"ui\" }\r\nandroidx-compose-ui-graphics = { group = \"androidx.compose.ui\", name = \"ui-graphics\" }\r\nandroidx-compose-ui-tooling = { group = \"androidx.compose.ui\", name = \"ui-tooling\" }\r\nandroidx-compose-ui-tooling-preview = { group = \"androidx.compose.ui\", name = \"ui-tooling-preview\" }\r\nandroidx-compose-ui-test-manifest = { group = \"androidx.compose.ui\", name = \"ui-test-manifest\" }\r\nandroidx-compose-ui-test-junit4 = { group = \"androidx.compose.ui\", name = \"ui-test-junit4\" }\r\nandroidx-compose-material3 = { group = \"androidx.compose.material3\", name = \"material3\" }\r\nandroidx-material3 = { group = \"androidx.compose.material3\", name = \"material3\", version.ref = \"material3\" }\r\nandroidx-camera-core = { group = \"androidx.camera\", name = \"camera-core\", version.ref = \"cameraCore\" }\r\nandroidx-ui-graphics = { group = \"androidx.compose.ui\", name = \"ui-graphics\", version.ref = \"uiGraphics\" }\r\nfirebase-auth = { group = \"com.google.firebase\", name = \"firebase-auth\", version.ref = \"firebaseAuth\" }\r\nfirebase-firestore = { group = \"com.google.firebase\", name = \"firebase-firestore\", version.ref = \"firebaseFirestore\" }\r\nplay-services-contextmanager = { group = \"com.google.android.gms\", name = \"play-services-contextmanager\", version.ref = \"playServicesContextmanager\" }\r\n\r\n[plugins]\r\nandroid-application = { id = \"com.android.application\", version.ref = \"agp\" }\r\nkotlin-android = { id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }\r\nkotlin-compose = { id = \"org.jetbrains.kotlin.plugin.compose\", version.ref = \"kotlin\" }\r\ngoogle-gms-google-services = { id = \"com.google.gms.google-services\", version.ref = \"googleGmsGoogleServices\" }\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
+--- a/gradle/libs.versions.toml	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/gradle/libs.versions.toml	(date 1769482501636)
+@@ -15,6 +15,7 @@
+ firebaseAuth = "24.0.1"
+ firebaseFirestore = "26.0.2"
+ playServicesContextmanager = "9.4.0"
++benchmarkTraceprocessor = "1.4.1"
+ 
+ [libraries]
+ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+@@ -37,6 +38,7 @@
+ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+ play-services-contextmanager = { group = "com.google.android.gms", name = "play-services-contextmanager", version.ref = "playServicesContextmanager" }
++androidx-benchmark-traceprocessor = { group = "androidx.benchmark", name = "benchmark-traceprocessor", version.ref = "benchmarkTraceprocessor" }
+ 
+ [plugins]
+ android-application = { id = "com.android.application", version.ref = "agp" }
+Index: app/src/main/java/com/example/weatherapp/db/fb/FBDatabase.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.db.fb\r\n\r\nimport com.google.firebase.firestore.DocumentChange\r\nimport com.google.firebase.Firebase\r\nimport com.google.firebase.auth.auth\r\nimport com.google.firebase.firestore.ListenerRegistration\r\nimport com.google.firebase.firestore.firestore\r\n\r\n\r\nclass FBDatabase {\r\n    interface Listener {\r\n        fun onUserLoaded(user: FBUser)\r\n        fun onUserSignOut()\r\n        fun onCityAdded(city: FBCity)\r\n        fun onCityUpdated(city: FBCity)\r\n        fun onCityRemoved(city: FBCity)\r\n    }\r\n    private val auth = Firebase.auth\r\n    private val db = Firebase.firestore\r\n    private var citiesListReg: ListenerRegistration? = null\r\n    private var listener : Listener? = null\r\n    init {\r\n        auth.addAuthStateListener { auth ->\r\n            if (auth.currentUser == null) {\r\n                citiesListReg?.remove()\r\n                listener?.onUserSignOut()\r\n                return@addAuthStateListener\r\n            }\r\n            val refCurrUser = db.collection(\"users\").document(auth.currentUser!!.uid)\r\n            refCurrUser.get().addOnSuccessListener {\r\n                it.toObject(FBUser::class.java)?.let { user ->\r\n                    listener?.onUserLoaded(user)\r\n                }\r\n            }\r\n            citiesListReg = refCurrUser.collection(\"cities\")\r\n                .addSnapshotListener { snapshots, ex ->\r\n                    if (ex != null) return@addSnapshotListener\r\n\r\n                    snapshots?.documentChanges?.forEach { change ->\r\n                            val fbCity = change.document.toObject(FBCity::class.java)\r\n                        if (change.type == DocumentChange.Type.ADDED) { listener?.onCityAdded(fbCity)\r\n                        } else if (change.type == DocumentChange.Type.MODIFIED) {\r\n                            listener?.onCityUpdated(fbCity)\r\n                        } else if (change.type == DocumentChange.Type.REMOVED) {\r\n                            listener?.onCityRemoved(fbCity)\r\n                        }\r\n                     }\r\n                }\r\n        }\r\n    }\r\n\r\n    fun setListener(listener: Listener? = null) {\r\n        this.listener = listener\r\n    }\r\n\r\n    fun register(user: FBUser) {\r\n        if (auth.currentUser == null)\r\n            throw RuntimeException(\"User not logged in!\")\r\n        val uid = auth.currentUser!!.uid\r\n        db.collection(\"users\").document(uid).set(user);\r\n    }\r\n\r\n    fun add(city: FBCity) {\r\n        if (auth.currentUser == null)\r\n            throw RuntimeException(\"User not logged in!\")\r\n        if (city.name == null || city.name!!.isEmpty())\r\n            throw RuntimeException(\"City with null or empty name!\")\r\n        val uid = auth.currentUser!!.uid\r\n        db.collection(\"users\").document(uid).collection(\"cities\")\r\n            .document(city.name!!).set(city)\r\n    }\r\n\r\n    fun remove(city: FBCity) {\r\n        if (auth.currentUser == null)\r\n            throw RuntimeException(\"User not logged in!\")\r\n        if (city.name == null || city.name!!.isEmpty())\r\n            throw RuntimeException(\"City with null or empty name!\")\r\n        val uid = auth.currentUser!!.uid\r\n        db.collection(\"users\").document(uid).collection(\"cities\")\r\n            .document(city.name!!).delete()\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/db/fb/FBDatabase.kt b/app/src/main/java/com/example/weatherapp/db/fb/FBDatabase.kt
+--- a/app/src/main/java/com/example/weatherapp/db/fb/FBDatabase.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/db/fb/FBDatabase.kt	(date 1769481796344)
+@@ -14,6 +14,7 @@
+         fun onCityAdded(city: FBCity)
+         fun onCityUpdated(city: FBCity)
+         fun onCityRemoved(city: FBCity)
++        fun loadForecast(name: String)
+     }
+     private val auth = Firebase.auth
+     private val db = Firebase.firestore
+Index: app/src/main/java/com/example/weatherapp/model/City.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.model\r\n\r\nimport com.google.android.gms.maps.model.LatLng\r\n\r\ndata class City(\r\n    val name : String,\r\n    val location: LatLng?\r\n)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/model/City.kt b/app/src/main/java/com/example/weatherapp/model/City.kt
+--- a/app/src/main/java/com/example/weatherapp/model/City.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/model/City.kt	(date 1770060261278)
+@@ -3,6 +3,6 @@
+ import com.google.android.gms.maps.model.LatLng
+ 
+ data class City(
+-    val name : String,
++    val name: String,
+     val location: LatLng?
+ )
+Index: app/src/main/java/com/example/weatherapp/ui/nav/BottomNavBar.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.ui.nav\r\n\r\nimport androidx.compose.material3.Icon\r\nimport androidx.compose.material3.NavigationBar\r\nimport androidx.compose.material3.NavigationBarItem\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.currentBackStackEntryAsState\r\n\r\n@Composable\r\nfun BottomNavBar(navController: NavHostController, items : List<BottomNavItem.BottomNavItem>) {\r\n    NavigationBar(\r\n        contentColor = Color.Black\r\n    ) {\r\n        val navBackStackEntry by navController.currentBackStackEntryAsState()\r\n        val currentRoute = navBackStackEntry?.destination\r\n        items.forEach { item ->\r\n            NavigationBarItem (\r\n                icon = { Icon(imageVector = item.icon, contentDescription= item.title)},\r\n                label = { Text(text = item.title, fontSize = 12.sp) },\r\n                alwaysShowLabel = true,\r\n                selected = currentRoute == item.route,\r\n                onClick = {\r\n                    navController.navigate(item.route) {\r\n// Volta pilha de navegação até HomePage (startDest).\r\n                        navController.graph.startDestinationRoute?.let {\r\n                            popUpTo(it) {\r\n                                saveState = true\r\n                            }\r\n                            restoreState = true\r\n                        }\r\n                        launchSingleTop = true\r\n                    }\r\n                }\r\n            )\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/ui/nav/BottomNavBar.kt b/app/src/main/java/com/example/weatherapp/ui/nav/BottomNavBar.kt
+--- a/app/src/main/java/com/example/weatherapp/ui/nav/BottomNavBar.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/ui/nav/BottomNavBar.kt	(date 1769518197819)
+@@ -1,40 +1,35 @@
+ package com.example.weatherapp.ui.nav
+ 
++import MainViewModel
+ import androidx.compose.material3.Icon
+ import androidx.compose.material3.NavigationBar
+ import androidx.compose.material3.NavigationBarItem
+ import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
+-import androidx.compose.runtime.getValue
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.unit.sp
+ import androidx.navigation.NavHostController
+-import androidx.navigation.compose.currentBackStackEntryAsState
+ 
+ @Composable
+-fun BottomNavBar(navController: NavHostController, items : List<BottomNavItem.BottomNavItem>) {
++fun BottomNavBar(
++    viewModel: MainViewModel,
++    items: List<BottomNavItem.BottomNavItem>,
++    navController: NavHostController
++) {
+     NavigationBar(
+         contentColor = Color.Black
+     ) {
+-        val navBackStackEntry by navController.currentBackStackEntryAsState()
+-        val currentRoute = navBackStackEntry?.destination
++//        val navBackStackEntry by navController.currentBackStackEntryAsState()
++//        val currentRoute = navBackStackEntry?.destination
+         items.forEach { item ->
+             NavigationBarItem (
+-                icon = { Icon(imageVector = item.icon, contentDescription= item.title)},
++                icon = { Icon(imageVector = item.icon,
++                    contentDescription= item.title)},
+                 label = { Text(text = item.title, fontSize = 12.sp) },
+                 alwaysShowLabel = true,
+-                selected = currentRoute == item.route,
++                selected = viewModel.page == item.route,
+                 onClick = {
+-                    navController.navigate(item.route) {
+-// Volta pilha de navegação até HomePage (startDest).
+-                        navController.graph.startDestinationRoute?.let {
+-                            popUpTo(it) {
+-                                saveState = true
+-                            }
+-                            restoreState = true
+-                        }
+-                        launchSingleTop = true
+-                    }
++                    viewModel.page = item.route
+                 }
+             )
+         }
+Index: app/src/main/java/com/example/weatherapp/ui/ListPage.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.ui\r\n\r\nimport MainViewModel\r\nimport android.annotation.SuppressLint\r\nimport android.app.Activity\r\nimport android.widget.Toast\r\nimport androidx.activity.compose.LocalActivity\r\nimport androidx.camera.core.Preview\r\nimport androidx.compose.foundation.clickable\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.size\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.items\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.Close\r\nimport androidx.compose.material.icons.rounded.FavoriteBorder\r\nimport androidx.compose.material3.Icon\r\nimport androidx.compose.material3.IconButton\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.runtime.toMutableStateList\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport com.example.weatherapp.model.City\r\nimport androidx.compose.material.icons.filled.Add\r\nimport androidx.compose.material.icons.automirrored.filled.ExitToApp\r\nimport androidx.compose.ui.unit.Dp\r\nimport com.example.weatherapp.model.Weather\r\n//import com.example.weatherapp.viewmodel.MainViewModel\r\n\r\n\r\n//@Preview(showBackground = true)\r\n\r\n@Composable\r\nfun ListPage(\r\n    modifier: Modifier = Modifier,\r\n    viewModel: MainViewModel\r\n) {\r\n\r\n    val activity = LocalActivity.current as? Activity\r\n    val cityList = viewModel.cities\r\n\r\n    LazyColumn(\r\n        modifier = modifier\r\n            .fillMaxSize()\r\n            .padding(                8.dp)\r\n            ) {\r\n        items(items = cityList, key = { it.name } ) { city ->\r\n            CityItem(city = city, weather = viewModel.weather(city.name),\r\n                        onClose = {\r\n                            viewModel.remove(city)\r\n                            Toast.makeText(\r\n                                activity, \"Cidade Deletada!\",\r\n                                Toast.LENGTH_LONG\r\n                            ).show()\r\n                        }, onClick = {\r\n                            Toast.makeText(\r\n                                activity, \"Cidade Favoritada\",\r\n                                Toast.LENGTH_LONG\r\n                            ).show()\r\n                        }\r\n                    )\r\n                }\r\n\r\n\r\n            }\r\n\r\n\r\n}\r\n\r\n\r\n    @Composable\r\n    fun CityItem(\r\n        city: City,\r\n        weather: Weather,\r\n        onClick: () -> Unit,\r\n        onClose: () -> Unit,\r\n        modifier: Modifier = Modifier\r\n    ) {\r\n        val desc = if (weather == Weather.LOADING) \"Carregando clima...\" else weather.desc\r\n        Row(\r\n            modifier = modifier\r\n                .fillMaxWidth()\r\n                .padding(8.dp)\r\n                .clickable { onClick() },\r\n            verticalAlignment = Alignment.CenterVertically\r\n        ) {\r\n            Icon(\r\n                Icons.Rounded.FavoriteBorder,\r\n                contentDescription = \"\"\r\n            )\r\n            Spacer (modifier = Modifier.size(12.dp))\r\n            Column (modifier = modifier.weight(1f)) {\r\n                Text(\r\n                    modifier = Modifier,\r\n                    text = city.name,\r\n                    fontSize = 24.sp\r\n                )\r\n                Text (modifier = Modifier,\r\n                    text = desc,\r\n                    fontSize = 16.sp\r\n                )\r\n            }\r\n            IconButton (onClick = onClose) {\r\n                Icon(\r\n                    Icons.Filled.Close,\r\n                    contentDescription = \"Close\"\r\n                )\r\n            }\r\n        }\r\n    }\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/ui/ListPage.kt b/app/src/main/java/com/example/weatherapp/ui/ListPage.kt
+--- a/app/src/main/java/com/example/weatherapp/ui/ListPage.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/ui/ListPage.kt	(date 1769804937286)
+@@ -5,6 +5,7 @@
+ import android.app.Activity
+ import android.widget.Toast
+ import androidx.activity.compose.LocalActivity
++import androidx.activity.compose.R
+ import androidx.camera.core.Preview
+ import androidx.compose.foundation.clickable
+ import androidx.compose.foundation.layout.Arrangement
+@@ -33,13 +34,18 @@
+ import com.example.weatherapp.model.City
+ import androidx.compose.material.icons.filled.Add
+ import androidx.compose.material.icons.automirrored.filled.ExitToApp
++import androidx.compose.ui.res.painterResource
+ import androidx.compose.ui.unit.Dp
+ import com.example.weatherapp.model.Weather
++import com.example.weatherapp.ui.nav.BottomNavItem
++
+ //import com.example.weatherapp.viewmodel.MainViewModel
+ 
+ 
+ //@Preview(showBackground = true)
+ 
++private val Unit.drawable: Any
++
+ @Composable
+ fun ListPage(
+     modifier: Modifier = Modifier,
+@@ -52,22 +58,25 @@
+     LazyColumn(
+         modifier = modifier
+             .fillMaxSize()
+-            .padding(                8.dp)
++            .padding(8.dp)
+             ) {
+         items(items = cityList, key = { it.name } ) { city ->
+             CityItem(city = city, weather = viewModel.weather(city.name),
+-                        onClose = {
+-                            viewModel.remove(city)
+-                            Toast.makeText(
+-                                activity, "Cidade Deletada!",
+-                                Toast.LENGTH_LONG
+-                            ).show()
+-                        }, onClick = {
+-                            Toast.makeText(
+-                                activity, "Cidade Favoritada",
+-                                Toast.LENGTH_LONG
+-                            ).show()
+-                        }
++                        onClick = {
++                            viewModel.city = city.name
++                            viewModel.page = BottomNavItem.Route.Home
++                            Toast.makeText(
++                                activity, "Cidade Favoritada",
++                                Toast.LENGTH_LONG
++                            ).show()
++                        },
++                onClose = {
++                    viewModel.remove(city)
++                    Toast.makeText(
++                        activity, "Cidade Deletada!",
++                        Toast.LENGTH_LONG
++                    ).show()
++                }
+                     )
+                 }
+ 
+@@ -93,7 +102,12 @@
+                 .padding(8.dp)
+                 .clickable { onClick() },
+             verticalAlignment = Alignment.CenterVertically
+-        ) {
++        ),
++        AsyncImage ( // Substitui o Icon(...)
++                model = weather.imgUrl,
++        modifier = Modifier.size(75.dp),
++        error = painterResource(id = R.drawable.loading),
++        contentDescription = "Imagem"{
+             Icon(
+                 Icons.Rounded.FavoriteBorder,
+                 contentDescription = ""
+@@ -119,3 +133,8 @@
+         }
+     }
+ 
++@Composable
++fun AsyncImage(model: String, modifier: Modifier, error: Painter, contentDescription: ERROR) {
++    TODO("Not yet implemented")
++}
++
+Index: app/src/main/java/com/example/weatherapp/ui/nav/MainNavHost.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weatherapp.ui.nav\r\n\r\nimport MainViewModel\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.lifecycle.viewmodel.compose.viewModel\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.NavHost\r\nimport androidx.navigation.compose.composable\r\nimport com.example.weatherapp.ui.HomePage\r\nimport com.example.weatherapp.ui.ListPage\r\nimport com.example.weatherapp.ui.MapPage\r\n//import com.example.weatherapp.viewmodel.MainViewModel\r\n\r\n@Composable\r\nfun MainNavHost(navController: NavHostController, viewModel: MainViewModel) {\r\n    NavHost(navController, startDestination = BottomNavItem.Route.Home) {\r\n        composable<BottomNavItem.Route.Home> {  HomePage(modifier = Modifier, viewModel) }\r\n        composable<BottomNavItem.Route.List> { ListPage(modifier = Modifier, viewModel) }\r\n        composable<BottomNavItem.Route.Map> { MapPage(modifier = Modifier, viewModel) }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weatherapp/ui/nav/MainNavHost.kt b/app/src/main/java/com/example/weatherapp/ui/nav/MainNavHost.kt
+--- a/app/src/main/java/com/example/weatherapp/ui/nav/MainNavHost.kt	(revision 135147a4753f425a8e46185385362c7b458e294c)
++++ b/app/src/main/java/com/example/weatherapp/ui/nav/MainNavHost.kt	(date 1769483731516)
+@@ -3,7 +3,6 @@
+ import MainViewModel
+ import androidx.compose.runtime.Composable
+ import androidx.compose.ui.Modifier
+-import androidx.lifecycle.viewmodel.compose.viewModel
+ import androidx.navigation.NavHostController
+ import androidx.navigation.compose.NavHost
+ import androidx.navigation.compose.composable
+@@ -15,7 +14,7 @@
+ @Composable
+ fun MainNavHost(navController: NavHostController, viewModel: MainViewModel) {
+     NavHost(navController, startDestination = BottomNavItem.Route.Home) {
+-        composable<BottomNavItem.Route.Home> {  HomePage(modifier = Modifier, viewModel) }
++        composable<BottomNavItem.Route.Home> {  HomePage(modifier = Modifier, viewModel = viewModel) }
+         composable<BottomNavItem.Route.List> { ListPage(modifier = Modifier, viewModel) }
+         composable<BottomNavItem.Route.Map> { MapPage(modifier = Modifier, viewModel) }
+     }
