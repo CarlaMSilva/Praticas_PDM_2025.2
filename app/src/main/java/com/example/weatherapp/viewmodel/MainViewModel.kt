@@ -14,6 +14,7 @@ import com.example.weatherapp.model.City
 import com.example.weatherapp.model.Forecast
 import com.example.weatherapp.model.User
 import com.example.weatherapp.model.Weather
+import com.example.weatherapp.ui.nav.BottomNavItem
 import com.google.android.gms.maps.model.LatLng
 
 class MainViewModel(
@@ -59,6 +60,11 @@ class MainViewModel(
             }
         }
     }
+
+    private var _page = mutableStateOf<BottomNavItem.Route>(BottomNavItem.Route.Home)
+    var page: BottomNavItem.Route
+        get() = _page.value
+        set (tmp) { _page.value = tmp }
 
     fun forecast(name: String) = _forecast.getOrPut(name) {
         loadForecast(name)

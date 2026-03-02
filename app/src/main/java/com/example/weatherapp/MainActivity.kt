@@ -113,10 +113,7 @@ class MainActivity : ComponentActivity() {
                             BottomNavItem.BottomNavItem.ListButton,
                             BottomNavItem.BottomNavItem.MapButton
                         )
-                        BottomNavBar(
-                            navController = navController,
-                            items = items
-                        )
+                        BottomNavBar(viewModel, items)
                     },
                     floatingActionButton = {
                         if (showButton) {
@@ -138,8 +135,21 @@ class MainActivity : ComponentActivity() {
 //                        launcher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
                         MainNavHost(navController = navController, viewModel)
                     }
+                    LaunchedEffect(viewModel.page) {
+                        navController.navigate(viewModel.page) {
+                        // Volta pilha de navegação até HomePage (startDest).
+                        navController.graph.startDestinationRoute?.let {
+                            popUpTo(it) {
+                                saveState = true
+                            }
+                            restoreState = true
+                        }
+                            launchSingleTop = true
+                        }
+                    }
+                        }
                 }
             }
         }
     }
-}
+

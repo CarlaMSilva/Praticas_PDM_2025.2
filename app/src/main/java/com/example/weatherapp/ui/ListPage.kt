@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.ui.unit.Dp
 import com.example.weatherapp.model.Weather
+import com.example.weatherapp.ui.nav.BottomNavItem
 import com.example.weatherapp.viewmodel.MainViewModel
 
 
@@ -57,17 +58,18 @@ fun ListPage(
         items(items = cityList, key = { it.name }) { city ->
             CityItem(
                 city = city, weather = viewModel.weather(city.name),
-
+                onClick = {
+                    viewModel.city = city.name
+                    viewModel.page = BottomNavItem.Route.Home
+                    Toast.makeText(
+                        activity, "Cidade Favoritada",
+                        Toast.LENGTH_LONG
+                    ).show()
+                },
                         onClose = {
                             viewModel.remove(city)
                             Toast.makeText(
                                 activity, "Cidade Deletada!",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }, onClick = {
-                    viewModel.city = city.name
-                            Toast.makeText(
-                                activity, "Cidade Favoritada",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -76,10 +78,7 @@ fun ListPage(
 
 
             }
-
-
 }
-
 
     @Composable
     fun CityItem(
