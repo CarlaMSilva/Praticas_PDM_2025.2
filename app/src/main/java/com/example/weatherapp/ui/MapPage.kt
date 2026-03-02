@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.weatherapp.model.Weather
 import com.example.weatherapp.viewmodel.MainViewModel
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -59,32 +60,29 @@ fun MapPage(
     ) {
 
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
+//            modifier = Modifier.fillMaxSize(),
+//            cameraPositionState = camePosState,
+//            properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
+//            uiSettings = MapUiSettings(myLocationButtonEnabled = true),
+            modifier = Modifier.weight(1f).fillMaxSize(),
             cameraPositionState = camePosState,
-            properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
-            uiSettings = MapUiSettings(myLocationButtonEnabled = true),
             onMapClick = { latLng ->
-//                viewModel.add(
-//                    "Cidade@${latLng.latitude}:${latLng.longitude}",
-//                    location = latLng
-
-                viewModel.addCity(  latLng)
+                viewModel.addCity(latLng)
             }
 
         ) {
 
-
-            viewModel.cities.forEach { city ->
-                city.location?.let {
+            viewModel.cities.forEach {
+                if (it.location != null) {
+                    val weather = viewModel.weather(it.name)
+                    val desc = if (weather == Weather.LOADING) "Carregando clima..."
+                    else weather.desc
                     Marker(
-                        state = MarkerState(position = it),
-                        title = city.name,
-                        snippet = "${it.latitude}, ${it.longitude}"
+                        state = MarkerState(position = it.location),
+                        title = it.name, snippet = desc
                     )
                 }
             }
-
-
             Marker(
                 state = MarkerState(position = recife),
                 title = "Recife",
@@ -111,6 +109,7 @@ fun MapPage(
                     BitmapDescriptorFactory.HUE_GREEN
                 )
             )
+
         }
 
         Text(
@@ -124,4 +123,5 @@ fun MapPage(
             fontSize = 20.sp
         )
     }
+
 }

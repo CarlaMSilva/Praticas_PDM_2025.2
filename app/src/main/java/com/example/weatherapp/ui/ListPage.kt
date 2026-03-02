@@ -33,6 +33,7 @@ import com.example.weatherapp.model.City
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.ui.unit.Dp
+import com.example.weatherapp.model.Weather
 import com.example.weatherapp.viewmodel.MainViewModel
 
 
@@ -51,11 +52,11 @@ fun ListPage(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(                8.dp)
+            .padding(8.dp)
             ) {
-                items(cityList, key = { it.name }) { city ->
-                    CityItem(
-                        city = city,
+        items(items = cityList, key = { it.name }) { city ->
+            CityItem(
+                city = city, weather = viewModel.weather(city.name),
                         onClose = {
                             viewModel.remove(city)
                             Toast.makeText(
@@ -81,10 +82,12 @@ fun ListPage(
     @Composable
     fun CityItem(
         city: City,
+        weather: Weather,
         onClick: () -> Unit,
         onClose: () -> Unit,
         modifier: Modifier = Modifier
     ) {
+        val desc = if (weather == Weather.LOADING) "Carregando clima..." else weather.desc
         Row(
             modifier = modifier
                 .fillMaxWidth()
@@ -104,7 +107,8 @@ fun ListPage(
                     fontSize = 24.sp
                 )
                 Text (modifier = Modifier,
-                    text = city.weather ?: "Carregando clima...",
+//                    text = city.weather ?: "Carregando clima...",
+                    text = desc,
                     fontSize = 16.sp
                 )
             }

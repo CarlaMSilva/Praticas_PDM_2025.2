@@ -12,6 +12,9 @@ interface WeatherServiceAPI {
         const val API_KEY = "e0981555c50b4f9bb2d225844260501"
 
     }
+
+    @GET("current.json?key=$API_KEY&lang=pt")
+    fun weather(@Query("q") query: String): Call<APICurrentWeather?>
     @GET("search.json")
     fun search(
         @Query("key") apiKey: String = API_KEY,

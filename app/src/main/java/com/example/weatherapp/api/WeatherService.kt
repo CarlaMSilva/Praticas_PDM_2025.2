@@ -2,6 +2,7 @@ package com.example.weatherapp.api
 
 import android.content.pm.LauncherApps
 import android.util.Log
+import com.google.android.gms.tasks.Tasks.call
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,6 +29,25 @@ class WeatherService {
         search(name) { loc -> onResponse(loc?.lat, loc?.lon) }
     }
 
+    fun getWeather(name: String, onResponse: (APICurrentWeather?) -> Unit) {
+        val call: Call<APICurrentWeather?> =
+            weatherAPI.weather(name)
+            enqueue (call) { onResponse.invoke(it) }
+    }
+
+    private fun <T> enqueue(call: Call<T?>, onResponse: ((T?) -> Unit)? = null) {
+        call.enqueue(object : Callback<T?> {
+            override fun onResponse(call: Call<T?>, response: Response<T?>) {
+                val obj: T? = response.body()
+                onResponse ?. invoke (obj)
+            }
+
+            override fun onFailure(call: Call<T?>, t: Throwable) {
+                Log.w("WeatherApp WARNING", "" + t.message)
+            }
+        })
+    }
+
     private fun search(query: String, onResponse: (APILocation?) -> Unit) {
         val call: Call<List<APILocation>> =
             weatherAPI.search(query = query)
@@ -46,4 +66,6 @@ class WeatherService {
             }
         })
     }
+
+
 }
