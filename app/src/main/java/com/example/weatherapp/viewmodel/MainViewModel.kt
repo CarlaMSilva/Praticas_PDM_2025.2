@@ -1,5 +1,6 @@
 package com.example.weatherapp.viewmodel
 
+import androidx.browser.browseractions.BrowserServiceFileProvider.loadBitmap
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -44,6 +45,15 @@ class MainViewModel(
             apiWeather?.let {
 
                 _weather[name] = it.toWeather()
+                loadBitmap(name)
+            }
+        }
+    }
+
+    fun loadBitmap(name: String) {
+        _weather[name]?.let { weather ->
+            service.getBitmap(weather.imgUrl) { bitmap ->
+                _weather[name] = weather.copy(bitmap = bitmap)
             }
         }
     }
