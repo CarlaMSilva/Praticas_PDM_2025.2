@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -21,22 +20,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.weatherapp.R
 import com.example.weatherapp.model.Forecast
 import com.example.weatherapp.viewmodel.MainViewModel
 import java.text.DecimalFormat
 
-
-//@Preview(showBackground = true)
 @Composable
-fun HomePage(viewModel: MainViewModel, modifier: Modifier.Companion) {
+fun HomePage(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     Column {
         if (viewModel.city == null) {
             Column(
@@ -49,33 +45,36 @@ fun HomePage(viewModel: MainViewModel, modifier: Modifier.Companion) {
                     text = "Selecione uma cidade!",
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    modifier = modifier.align(Alignment.CenterHorizontally),
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
                     textAlign = TextAlign.Center,
                     fontSize = 28.sp
                 )
             }
         } else {
+            // --- Passo 4: Modificando a HomePage ---
             Row {
-                Icon(
-                    imageVector = Icons.Filled.AccountBox,
-                    contentDescription = "Localized description",
-                    modifier = modifier.size(150.dp)
+                AsyncImage( // Substitui o Icon [cite: 31, 37]
+                    model = viewModel.weather(viewModel.city!!).imgUrl, //
+                    modifier = Modifier.size(140.dp), //
+                    error = painterResource(id = R.drawable.loading), // [cite: 39]
+                    contentDescription = "Imagem" // [cite: 39]
                 )
+
                 Column {
-                    Spacer(modifier = modifier.size(12.dp))
-                    Text (text = viewModel.city?: "Selecione uma cidade...",
-                        fontSize = 28.sp)
+                    Spacer(modifier = Modifier.size(12.dp))
+                    Text(text = viewModel.city ?: "Selecione uma cidade...", fontSize = 28.sp)
                     viewModel.city?.let { name ->
-                    val weather = viewModel.weather(name)
-                        Spacer (modifier = modifier.size(12.dp))
-                        Text (text = weather?.desc?: "...", fontSize = 22.sp)
-                        Spacer(modifier = modifier.size(12.dp))
-                        Text(text = "Temp: "+weather?.temp+"℃",
-                            fontSize = 22.sp)
-                }
+                        val weather = viewModel.weather(name)
+                        Spacer(modifier = Modifier.size(12.dp))
+                        // Note: Usamos o desc vindo do objeto weather [cite: 110]
+                        Text(text = weather.desc ?: "...", fontSize = 22.sp)
+                        Spacer(modifier = Modifier.size(12.dp))
+                        Text(text = "Temp: ${weather.temp}℃", fontSize = 22.sp)
+                    }
                 }
             }
-            viewModel.forecast (viewModel.city!!)?.let { forecasts ->
+
+            viewModel.forecast(viewModel.city!!)?.let { forecasts ->
                 LazyColumn {
                     items(items = forecasts) { forecast ->
                         ForecastItem(forecast, onClick = { })
@@ -96,40 +95,34 @@ fun ForecastItem(
     val tempMin = format.format(forecast.tempMin)
     val tempMax = format.format(forecast.tempMax)
 
-    Row (modifier =
-        modifier.fillMaxWidth().padding(12.dp)
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp)
             .clickable(onClick = { onClick(forecast) }),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // AsyncImage( // Substitui o Icon
-        //     model = viewModel.weather(viewModel.city!!).imgUrl,
-        //     modifier = Modifier.size(140.dp),
-        //     error = painterResource(id = R.drawable.loading),
-        //     contentDescription = "Imagem"
-        // )
-        Icon(imageVector = Icons.Filled.LocationOn,
-            contentDescription = "Localized description",
-            modifier = Modifier.size(48.dp)
+        // --- Passo 5: Modificando o ForecastItem ---
+        AsyncImage( // Substitui o Icon [cite: 43, 47]
+            model = forecast.imgUrl, // [cite: 48]
+            modifier = Modifier.size(70.dp), // [cite: 49]
+            error = painterResource(id = R.drawable.loading), // [cite: 50]
+            contentDescription = "Imagem" // [cite: 51]
         )
 
-        Spacer (modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(16.dp))
 
         Column {
             Text(
-                modifier = Modifier,
                 text = forecast.weather,
                 fontSize = 24.sp
             )
             Row {
-                Text(modifier = Modifier, text = forecast.date, fontSize = 20.sp)
-                Spacer (modifier =
-                    Modifier.size(12.dp
-                    )
-                )
-                Text (modifier = Modifier, text = "Min: $tempMin℃", fontSize = 16.sp)
-                Spacer(modifier = Modifier.size(12.dp)
-                )
-                Text(modifier = Modifier, text = "Max: $tempMax℃", fontSize = 16.sp)
+                Text(text = forecast.date, fontSize = 20.sp)
+                Spacer(modifier = Modifier.size(12.dp))
+                Text(text = "Min: $tempMin℃", fontSize = 16.sp)
+                Spacer(modifier = Modifier.size(12.dp))
+                Text(text = "Max: $tempMax℃", fontSize = 16.sp)
             }
         }
     }
