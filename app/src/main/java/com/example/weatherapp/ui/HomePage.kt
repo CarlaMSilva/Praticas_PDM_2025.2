@@ -21,13 +21,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.weatherapp.R
 import com.example.weatherapp.model.Forecast
 import com.example.weatherapp.viewmodel.MainViewModel
 import java.text.DecimalFormat
+
 
 //@Preview(showBackground = true)
 @Composable
@@ -96,6 +101,12 @@ fun ForecastItem(
             .clickable(onClick = { onClick(forecast) }),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // AsyncImage( // Substitui o Icon
+        //     model = viewModel.weather(viewModel.city!!).imgUrl,
+        //     modifier = Modifier.size(140.dp),
+        //     error = painterResource(id = R.drawable.loading),
+        //     contentDescription = "Imagem"
+        // )
         Icon(imageVector = Icons.Filled.LocationOn,
             contentDescription = "Localized description",
             modifier = Modifier.size(48.dp)

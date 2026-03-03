@@ -1,21 +1,18 @@
-import io.netty.util.ReferenceCountUtil.release
 import java.util.Properties
-
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
-    id ("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.kotlin.serialization)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+
 }
 
 android {
     namespace = "com.example.weatherapp"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.weatherapp"
@@ -28,9 +25,10 @@ android {
 
         val keyFile = project.rootProject.file("local.properties")
         val props = Properties()
-        props.load(keyFile.inputStream())
-        buildConfigField ("String", "WEATHER_API_KEY",
-            props.getProperty("WEATHER_API_KEY"))
+        if (keyFile.exists()) {
+            props.load(keyFile.inputStream())
+        }
+        buildConfigField("String", "WEATHER_API_KEY", "\"${props.getProperty("WEATHER_API_KEY") ?: ""}\"")
     }
 
     buildTypes {
@@ -51,8 +49,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    buildFeatures {
         buildConfig = true
     }
 }
@@ -67,24 +63,29 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation("androidx.navigation:navigation-compose:2.9.5")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation(libs.androidx.material3)
     implementation("androidx.compose.material:material-icons-extended:1.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     implementation(libs.androidx.camera.core)
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+    
     // Google maps
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    
     // Google maps for compose
     implementation("com.google.maps.android:maps-compose:2.8.0")
+    
     implementation(libs.androidx.ui.graphics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation ("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation ("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -93,6 +94,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-
 }

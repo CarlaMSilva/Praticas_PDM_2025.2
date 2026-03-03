@@ -32,7 +32,11 @@ import androidx.compose.ui.unit.sp
 import com.example.weatherapp.model.City
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+//import androidx.compose.runtime.saveable.R
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
+import coil.compose.AsyncImage
+import com.example.weatherapp.R
 import com.example.weatherapp.model.Weather
 import com.example.weatherapp.ui.nav.BottomNavItem
 import com.example.weatherapp.viewmodel.MainViewModel
@@ -96,6 +100,12 @@ fun ListPage(
                 .clickable { onClick() },
             verticalAlignment = Alignment.CenterVertically
         ) {
+            AsyncImage(
+                // Substitui o Icon(...)
+                model = weather.imgUrl,
+                modifier = Modifier.size(75.dp),
+                error = painterResource(id = R.drawable.loading),
+                contentDescription = "Imagem" )
             Icon(
                 Icons.Rounded.FavoriteBorder,
                 contentDescription = ""
